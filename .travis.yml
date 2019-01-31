@@ -14,12 +14,14 @@ matrix:
   allow_failures:
     - rust: nightly
 script:
+  - set -e
   - cargo clean
   - cargo build
   - cargo test
   - cargo doc --no-deps
   - cargo package
-# cargo publish
+  # - cargo publish
+  - set +e
 
 after_success: |
   if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
