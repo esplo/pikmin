@@ -32,7 +32,7 @@ script:
 after_success: |
   if [[ "$TRAVIS_RUST_VERSION" == nightly ]]; then
     set -e
-    cargo tarpaulin --no-count --out Xml &&
+    cargo tarpaulin --out Xml &&
     bash <(curl -s https://codecov.io/bash)
     set +e
   fi
