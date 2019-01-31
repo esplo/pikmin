@@ -5,7 +5,7 @@ authors = ["esplo <esplo@users.noreply.github.com>"]
 edition = "2018"
 
 description = "An extensible downloader for obtaining trade data simultaneously from exchanges' API."
-
+repository = "https://github.com/esplo/pikmin"
 readme = "README.md"
 keywords = ["cryptocurrency", "downloader", "util"]
 categories = ["command-line-utilities"]
@@ -31,6 +31,3 @@ name = "main"
 
 [[example]]
 name = "simple"
-
-
-
