@@ -11,6 +11,10 @@ keywords = ["cryptocurrency", "downloader", "util"]
 categories = ["command-line-utilities"]
 license = "MIT"
 
+exclude = [
+    ".travis.yml",
+]
+
 [dependencies]
 log = "^0.4"
 reqwest = "^0.9"
