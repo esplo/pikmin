@@ -10,9 +10,9 @@ downloaders, but also ability to build a custom downloader for users' demand.
 
 Currently, this library has the following downloaders:
 
-* BitMex (specify time, backwards to forwards)
-* bitFlyer (specify id, forwards to backwards)
-* Liquid (specify time, backwards to forwards)
+* BitMex (specify time, chronologically)
+* bitFlyer (specify id, reverse-chronologically)
+* Liquid (specify time, chronologically)
 
 ## Built-in Writer
 
@@ -90,5 +90,5 @@ Other examples can be found in `./examples`.
 ## Future work
 
 - create pre-composed downloaders for other exchanges
-- parameterize the direction of downloading
+- parameterize the direction of downloading (chronologically or not)
 - abstraction of the progress writer
