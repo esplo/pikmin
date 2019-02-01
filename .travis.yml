@@ -13,12 +13,10 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
-
 before_cache: |
   if [[ "$TRAVIS_RUST_VERSION" == nightly ]]; then
     RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin -f
   fi
-
 script:
   - set -e
   - cargo clean
@@ -26,10 +24,7 @@ script:
   - cargo test
   - cargo doc --no-deps
   - cargo package
-  - cargo login ${CRATES_IO_TOKEN}
-  - cargo publish
   - set +e
-
 after_success: |
   if [[ "$TRAVIS_RUST_VERSION" == nightly ]]; then
     set -e
@@ -37,3 +32,10 @@ after_success: |
     bash <(curl -s https://codecov.io/bash)
     set +e
   fi
+deploy:
+  provider: cargo
+  token:
+    secure: deASSDPB9AR+FKkREXrmzsH8cXTVeAYGQdkQ4s3/cWVCMqdati8KNfN/oWcG93FdgXoMMLU+Pozj6rjloCIsnejW3FzK4MNGVQi4npaQD7ythG0Tv/nvK9bML5uYEDZOODEW85i1SJSfzmTNFwYLaFWMZiLDWwy53euz9sOGuo3uphOkUFOWIBmgvnzFBelGQmo56Cp3dHbPBDUfStSIxSxDpOlJr439czCTz+b5zZ86rCuEeWM6h0XHb7jYoxrbEgltYJNjHwEqlxUQ2UR19rMmu7piKhen93OPWb1S5aoeWlPhxlPimYFzCmp0mGTwfEnTgG99qqiiOb6k526M2f2Oh5/wI3kYLYNIApTBzR2eeuRtfgVe2GIkhQT0sLj/Sh0FNXlp4mRoNhVQEPzI0Vw/n7Osy3mLexiAFN9gs0K/2v34LifkPPjf+3QZpvepccY298EvPiRNY2LcVa2Nd87zf/jAq39tyMXONUxupjbVH0L5/Y5oMMwtLw4B4MGKC7qhlWIuLKnBhptWjz7ji26BWUnb/3tGMdAXk+xXo4HBGl/ClwyQo14CBHc7tv5tPvf5/YaBpYKVedchzNWJ5EdUJyBjV2HO+s+7hypaTUmJXzif2d8KJIe1uSU1jCkv8Ij3k8u8n8RLuY8ojmVJspu6pPPl9j9mOCkgijz9Z04=
+  on:
+    branch: master
+    tags: true
