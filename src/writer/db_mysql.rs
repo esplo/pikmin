@@ -23,12 +23,15 @@ pub trait MySQLWriterElement {
 /// # Example
 ///
 /// ```
-/// vec![
-///   TableDef::new("id", "BIGINT NOT NULL PRIMARY KEY"),
-///   TableDef::new("traded_at", "TIMESTAMP(3) NOT NULL"),
-///   TableDef::new("amount", "FLOAT NOT NULL"),
-///   TableDef::new("price", "FLOAT NOT NULL"),
-/// ]
+/// use pikmin::writer::db_mysql::TableDef;
+/// fn table_def() -> Vec<TableDef> {
+///     vec![
+///         TableDef::new("id", "BIGINT NOT NULL PRIMARY KEY"),
+///         TableDef::new("traded_at", "TIMESTAMP(3) NOT NULL"),
+///         TableDef::new("amount", "FLOAT NOT NULL"),
+///         TableDef::new("price", "FLOAT NOT NULL"),
+///     ]
+/// }
 /// ```
 #[derive(Debug)]
 pub struct TableDef(String, String);
