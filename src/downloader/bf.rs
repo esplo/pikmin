@@ -64,7 +64,7 @@ impl Downloader for BfDownloader {
         Ok(Trade {
             id: format!("{}", v.id),
             quantity,
-            price: price as f32,
+            price,
             traded_at,
         })
     }
