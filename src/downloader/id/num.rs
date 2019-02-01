@@ -3,11 +3,14 @@ use std::fmt::Display;
 use crate::downloader::id::DownloaderID;
 use crate::error::Result;
 
+/// An ID implementation by integer numbers.
+#[derive(Debug)]
 pub struct OrdID<T: Ord> {
     current: T,
 }
 
 impl<T: Ord> OrdID<T> {
+    /// Creates an ID with a given number.
     pub fn new(current: T) -> Self {
         OrdID { current }
     }

@@ -9,25 +9,46 @@ use crate::error::Result;
 use crate::writer::Trade;
 use crate::writer::Writer;
 
+/// An constraint for MySQLWriter.
 pub trait MySQLWriterElement {
+    /// Converts a contents into MySQL params.
     fn to_params(&self) -> Params;
+    /// Returns a table definition for MySQL.
     fn table_def() -> Vec<TableDef>;
 }
 
+/// A definition for MySQL.
+/// First value is a name of the column, and 2nd is a following definition in a `CREATE TABLE` statement.
+///
+/// # Example
+///
+/// ```
+/// vec![
+///   TableDef::new("id", "BIGINT NOT NULL PRIMARY KEY"),
+///   TableDef::new("traded_at", "TIMESTAMP(3) NOT NULL"),
+///   TableDef::new("amount", "FLOAT NOT NULL"),
+///   TableDef::new("price", "FLOAT NOT NULL"),
+/// ]
+/// ```
+#[derive(Debug)]
 pub struct TableDef(String, String);
 
 impl TableDef {
+    /// Creates a column of a table definition.
     pub fn new(s1: &str, s2: &str) -> Self {
         TableDef(String::from(s1), String::from(s2))
     }
 }
 
+/// A writer implementation for MySQL.
+#[derive(Debug)]
 pub struct MySQLWriter<'a> {
     table_name: &'a str,
     connection: Pool,
 }
 
 impl<'a> MySQLWriter<'a> {
+    /// Creates a writer for MySQL with a given URL and a table name.
     pub fn new(table_name: &'a str, database_url: &str) -> Self {
         trace!("connect to {}", database_url);
         let connection = Pool::new(database_url).expect("cannot connect to DB");

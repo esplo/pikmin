@@ -16,6 +16,7 @@ pub struct QnGetExecution {
     pub created_at: u64,
 }
 
+#[derive(Debug)]
 pub struct LiquidAPI {
     reqwest_client: Client,
     product_code: &'static str,

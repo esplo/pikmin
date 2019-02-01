@@ -8,16 +8,24 @@ use crate::writer::db_mysql::MySQLWriterElement;
 use crate::writer::db_mysql::TableDef;
 use crate::writer::stdout::StdOutWriterElement;
 
+/// A writer implementation for MySQL.
 pub mod db_mysql;
 #[cfg(test)]
 pub mod mock;
+/// A writer implementation for stdout.
 pub mod stdout;
 
+/// Standard trade implementation. The data from an external source must be converted into this.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Trade {
+    /// An unique string as a `primary key`. This value is useful to prevent recording
+    /// the same data twice.
     pub id: String,
+    /// A timestamp to represent when trade occurred.
     pub traded_at: DateTime<Utc>,
+    /// A size of the trade. If this value is negative, this trade is `short` direction.
     pub quantity: f32,
+    /// A traded price.
     pub price: f32,
 }
 
@@ -60,6 +68,8 @@ impl StdOutWriterElement for Trade {
     }
 }
 
+/// An abstraction of recorders. See StdOutWriter for an usage example.
 pub trait Writer {
+    /// Records `trades` on somewhere (typically DB).
     fn write(&mut self, trades: &[Trade]) -> Result<u64>;
 }

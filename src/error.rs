@@ -1,21 +1,33 @@
 use std::error::Error as _Error;
 use std::fmt;
 
+/// An alias for representing a downloading result easily.
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Errors encountered by the downloading.
 #[derive(Debug)]
 pub enum Error {
+    /// An `reqwest::Error` that occurred while fetching from an external API.
     Reqwest(reqwest::Error),
+    /// An `std::num::ParseFloatError` that occurred while converting a value to a Float value.
     ParseFloat(std::num::ParseFloatError),
+    /// An `std::num::ParseIntError` that occurred while converting a value to a Int value.
     ParseInt(std::num::ParseIntError),
+    /// An error that occurred while reading an initial value from a storage.
     ParseInitialValue,
+    /// An `mysql::error::Error` that occurred in general MySQL processing.
     MySql(Box<mysql::error::Error>),
+    /// An error that occurred when parameter mappings are invalid.
     MySqlMissingNamedParameter(Box<std::error::Error>),
+    /// An error that occurred when fetched data is empty.
     NotFound,
     /// An `io::Error` that occurred while trying to read or write to a network stream.
     IO(std::io::Error),
+    /// An `chrono::format::ParseError` that occurred while converting a value to a chrono::DateTime.
     ChronoParse(chrono::format::ParseError),
-    CannotFetchExecutions,
+    /// An error that occurred when it is impossible to fetch all trade data accurately since
+    /// there are too many record at the same timestamp.
+    CannotFetchTradesAccurately,
 }
 
 impl fmt::Display for Error {
@@ -46,7 +58,7 @@ impl std::error::Error for Error {
             Error::NotFound => "No data found",
             Error::IO(ref e) => e.description(),
             Error::ChronoParse(ref e) => e.description(),
-            Error::CannotFetchExecutions => "Cannot fetch from API",
+            Error::CannotFetchTradesAccurately => "Cannot fetch from API",
         }
     }
 }

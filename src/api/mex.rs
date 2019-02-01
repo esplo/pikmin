@@ -23,6 +23,7 @@ pub struct MexGetExecution {
     foreignNotional: u64,
 }
 
+#[derive(Debug)]
 pub struct MexAPI {
     reqwest_client: Client,
     product_code: &'static str,

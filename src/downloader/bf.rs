@@ -11,6 +11,8 @@ use crate::error::Result;
 use crate::writer::Trade;
 use crate::writer::Writer;
 
+/// A pre-built downloader for bitFlyer.
+#[derive(Debug)]
 pub struct BfDownloader {
     start: u64,
     end: u64,
@@ -22,6 +24,8 @@ impl BfDownloader {
         1000
     }
 
+    /// Creates a new downloader with a specific range.
+    /// The input source is fixed.
     pub fn new(newer: u64, older: u64) -> Self {
         BfDownloader {
             start: older,

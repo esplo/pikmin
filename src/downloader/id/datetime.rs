@@ -4,11 +4,14 @@ use chrono::Utc;
 use crate::downloader::id::DownloaderID;
 use crate::error::Result;
 
+/// An ID implementation by chrono::DateTime<Utc>.
+#[derive(Debug)]
 pub struct DateTimeID {
     current: DateTime<Utc>,
 }
 
 impl DateTimeID {
+    /// Creates an ID with a given time.
     pub fn new(current: DateTime<Utc>) -> Self {
         DateTimeID { current }
     }

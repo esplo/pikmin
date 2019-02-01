@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::writer::Trade;
 use crate::writer::Writer;
 
+#[derive(Debug)]
 pub struct MockWriter {
     pub store: Vec<Trade>,
 }

@@ -70,7 +70,6 @@
 //! }
 //! ```
 
-
 pub use self::downloader::bf::BfDownloader;
 pub use self::downloader::bitmex::MexDownloader;
 pub use self::downloader::liquid::LiquidDownloader;

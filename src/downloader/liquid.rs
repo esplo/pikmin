@@ -12,6 +12,8 @@ use crate::error::Result;
 use crate::writer::Trade;
 use crate::writer::Writer;
 
+/// A pre-built downloader for Liquid.
+#[derive(Debug)]
 pub struct LiquidDownloader {
     start: DateTime<Utc>,
     end: DateTime<Utc>,
@@ -23,6 +25,8 @@ impl LiquidDownloader {
         1000
     }
 
+    /// Creates a new downloader with a specific range.
+    /// The input source is fixed.
     pub fn new(start: DateTime<Utc>, end: DateTime<Utc>) -> Self {
         LiquidDownloader {
             start,
@@ -85,7 +89,7 @@ impl Downloader for LiquidDownloader {
                         "more than {} executions at the same timestamp",
                         self.limit()
                     );
-                    Err(Error::CannotFetchExecutions)
+                    Err(Error::CannotFetchTradesAccurately)
                 } else {
                     writer.write(without_last.as_slice()).map(|num| {
                         info!("wrote {} data", num);

@@ -4,11 +4,14 @@ use crate::error::Result;
 use crate::writer::Trade;
 use crate::writer::Writer;
 
+/// An constraint for StdOutWriter.
 pub trait StdOutWriterElement {
+    /// Converts a contents into a string.
     fn to_string(&self) -> String;
 }
 
-#[derive(Default)]
+/// A writer implementation for stdout.
+#[derive(Default, Debug)]
 pub struct StdOutWriter {}
 
 impl Writer for StdOutWriter {

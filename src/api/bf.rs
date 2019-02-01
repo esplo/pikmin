@@ -17,6 +17,7 @@ pub struct BfGetExecution {
     pub sell_child_order_acceptance_id: String,
 }
 
+#[derive(Debug)]
 pub struct BfAPI {
     reqwest_client: Client,
     product_code: &'static str,
