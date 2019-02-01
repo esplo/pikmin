@@ -26,7 +26,8 @@ script:
   - cargo test
   - cargo doc --no-deps
   - cargo package
-  # - cargo publish
+  - cargo login ${CRATES_IO_TOKEN}
+  - cargo publish
   - set +e
 
 after_success: |
