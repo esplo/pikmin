@@ -8,14 +8,13 @@ pub enum Error {
     Reqwest(reqwest::Error),
     ParseFloat(std::num::ParseFloatError),
     ParseInt(std::num::ParseIntError),
-    ParseInitialValueError,
-
+    ParseInitialValue,
     MySql(Box<mysql::error::Error>),
     MySqlMissingNamedParameter(Box<std::error::Error>),
     NotFound,
     /// An `io::Error` that occurred while trying to read or write to a network stream.
     IO(std::io::Error),
-    ChronoParseError(chrono::format::ParseError),
+    ChronoParse(chrono::format::ParseError),
     CannotFetchExecutions,
 }
 
@@ -28,7 +27,7 @@ impl fmt::Display for Error {
             Error::MySql(ref e) => e.fmt(f),
             Error::MySqlMissingNamedParameter(ref e) => e.fmt(f),
             Error::IO(ref e) => e.fmt(f),
-            Error::ChronoParseError(ref e) => e.fmt(f),
+            Error::ChronoParse(ref e) => e.fmt(f),
 
             ref e => f.write_str(e.description()),
         }
@@ -41,12 +40,12 @@ impl std::error::Error for Error {
             Error::Reqwest(ref e) => e.description(),
             Error::ParseFloat(ref e) => e.description(),
             Error::ParseInt(ref e) => e.description(),
-            Error::ParseInitialValueError => "Cannot parse the initial value",
+            Error::ParseInitialValue => "Cannot parse the initial value",
             Error::MySql(ref e) => e.description(),
             Error::MySqlMissingNamedParameter(ref e) => e.description(),
             Error::NotFound => "No data found",
             Error::IO(ref e) => e.description(),
-            Error::ChronoParseError(ref e) => e.description(),
+            Error::ChronoParse(ref e) => e.description(),
             Error::CannotFetchExecutions => "Cannot fetch from API",
         }
     }
@@ -84,6 +83,6 @@ impl From<std::io::Error> for Error {
 
 impl From<chrono::format::ParseError> for Error {
     fn from(err: chrono::format::ParseError) -> Error {
-        Error::ChronoParseError(err)
+        Error::ChronoParse(err)
     }
 }
