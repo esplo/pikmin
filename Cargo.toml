@@ -35,3 +35,7 @@ name = "main"
 
 [[example]]
 name = "simple"
+
+[badges]
+travis-ci = { repository = "esplo/pikmin", branch = "master" }
+codecov = { repository = "esplo/pikmin", branch = "master", service = "github" }

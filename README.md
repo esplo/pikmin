@@ -2,6 +2,12 @@
 
 An extensible downloader for obtaining trade data simultaneously from exchanges' API.
 
+[![Build Status](https://travis-ci.org/esplo/pikmin.svg?branch=master)](https://travis-ci.org/esplo/pikmin)
+[![crates.io](https://img.shields.io/crates/v/pikmin.svg?style=flat)](https://crates.io/crates/pikmin)
+[![Documentation](https://docs.rs/pikmin/badge.svg)](
+https://docs.rs/pikmin)
+[![codecov](https://codecov.io/gh/esplo/pikmin/branch/master/graph/badge.svg)](https://codecov.io/gh/esplo/pikmin)
+
 `pikmin` is a trade (execution) data downloader for crypto-currency exchanges,
 such as BitMex, bitFlyer, Liquid, etc. This library provides not only some pre-composed
 downloaders, but also ability to build a custom downloader for users' demand.
