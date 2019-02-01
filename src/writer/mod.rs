@@ -54,7 +54,7 @@ impl MySQLWriterElement for Trade {
 
     fn table_def() -> Vec<TableDef> {
         vec![
-            TableDef::new("id", "BIGINT NOT NULL PRIMARY KEY"),
+            TableDef::new("id", "VARCHAR(64) NOT NULL PRIMARY KEY"),
             TableDef::new("traded_at", "TIMESTAMP(3) NOT NULL"),
             TableDef::new("amount", "FLOAT NOT NULL"),
             TableDef::new("price", "FLOAT NOT NULL"),
