@@ -4,7 +4,7 @@ use chrono::Utc;
 use log::{error, info, warn};
 
 use crate::api::liquid::LiquidAPI;
-use crate::api::liquid::QnGetExecution;
+use crate::api::liquid::LiquidGetExecution;
 use crate::downloader::Downloader;
 use crate::downloader::id::datetime::DateTimeID;
 use crate::error::Error;
@@ -39,7 +39,7 @@ impl LiquidDownloader {
 impl Downloader for LiquidDownloader {
     type IDT = DateTime<Utc>;
     type ID = DateTimeID;
-    type RAW = QnGetExecution;
+    type RAW = LiquidGetExecution;
 
     fn start_id(&self) -> DateTime<Utc> {
         self.start
@@ -52,11 +52,11 @@ impl Downloader for LiquidDownloader {
         current <= end
     }
 
-    fn fetch(&self, c: &Self::IDT) -> Result<Vec<QnGetExecution>> {
+    fn fetch(&self, c: &Self::IDT) -> Result<Vec<LiquidGetExecution>> {
         self.api.executions(c.timestamp() as u64, self.limit())
     }
 
-    fn convert(&self, v: &QnGetExecution) -> Result<Trade> {
+    fn convert(&self, v: &LiquidGetExecution) -> Result<Trade> {
         let quantity = v.quantity.parse::<f32>()?;
         let price = v.price.parse::<f32>()?;
         let created_at = Utc.timestamp(v.created_at as i64, 0);

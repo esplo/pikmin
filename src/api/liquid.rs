@@ -8,7 +8,7 @@ use crate::error::Error;
 use crate::error::Result;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct QnGetExecution {
+pub struct LiquidGetExecution {
     pub id: u64,
     pub quantity: String,
     pub price: String,
@@ -36,7 +36,7 @@ impl LiquidAPI {
         }
     }
 
-    pub fn executions(&self, timestamp: u64, limit: usize) -> Result<Vec<QnGetExecution>> {
+    pub fn executions(&self, timestamp: u64, limit: usize) -> Result<Vec<LiquidGetExecution>> {
         trace!("executions -- timestamp:{}, limit:{}", timestamp, limit);
         let path = format!(
             "/executions?product_id={}&timestamp={}&limit={}",
