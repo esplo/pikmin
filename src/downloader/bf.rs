@@ -21,7 +21,7 @@ pub struct BfDownloader {
 
 impl BfDownloader {
     fn limit(&self) -> usize {
-        1000
+        500
     }
 
     /// Creates a new downloader with a specific range.
