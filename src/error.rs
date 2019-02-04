@@ -13,8 +13,8 @@ pub enum Error {
     ParseFloat(std::num::ParseFloatError),
     /// An `std::num::ParseIntError` that occurred while converting a value to a Int value.
     ParseInt(std::num::ParseIntError),
-    /// An error that occurred while reading an initial value from a storage.
-    ParseInitialValue,
+    /// An error that occurred while reading an ID value from a string.
+    ParseValueFromStr,
     /// An `mysql::error::Error` that occurred in general MySQL processing.
     MySql(Box<mysql::error::Error>),
     /// An error that occurred when parameter mappings are invalid.
@@ -28,6 +28,8 @@ pub enum Error {
     /// An error that occurred when it is impossible to fetch all trade data accurately since
     /// there are too many record at the same timestamp.
     CannotFetchTradesAccurately,
+    /// An error that occurred when it failed to parse as a json value.
+    ParseJson(serde_json::error::Error),
 }
 
 impl fmt::Display for Error {
@@ -40,6 +42,7 @@ impl fmt::Display for Error {
             Error::MySqlMissingNamedParameter(ref e) => e.fmt(f),
             Error::IO(ref e) => e.fmt(f),
             Error::ChronoParse(ref e) => e.fmt(f),
+            Error::ParseJson(ref e) => e.fmt(f),
 
             ref e => f.write_str(e.description()),
         }
@@ -52,13 +55,14 @@ impl std::error::Error for Error {
             Error::Reqwest(ref e) => e.description(),
             Error::ParseFloat(ref e) => e.description(),
             Error::ParseInt(ref e) => e.description(),
-            Error::ParseInitialValue => "Cannot parse the initial value",
+            Error::ParseValueFromStr => "Cannot parse the initial value",
             Error::MySql(ref e) => e.description(),
             Error::MySqlMissingNamedParameter(ref e) => e.description(),
             Error::NotFound => "No data found",
             Error::IO(ref e) => e.description(),
             Error::ChronoParse(ref e) => e.description(),
             Error::CannotFetchTradesAccurately => "Cannot fetch from API",
+            Error::ParseJson(ref e) => e.description(),
         }
     }
 }
@@ -96,5 +100,11 @@ impl From<std::io::Error> for Error {
 impl From<chrono::format::ParseError> for Error {
     fn from(err: chrono::format::ParseError) -> Error {
         Error::ChronoParse(err)
+    }
+}
+
+impl From<serde_json::error::Error> for Error {
+    fn from(err: serde_json::error::Error) -> Error {
+        Error::ParseJson(err)
     }
 }

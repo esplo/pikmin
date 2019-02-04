@@ -45,7 +45,7 @@ pub trait Downloader {
             Ok(s) => {
                 let id_value = s
                     .parse::<Self::IDT>()
-                    .map_err(|_| Error::ParseInitialValue)?;
+                    .map_err(|_| Error::ParseValueFromStr)?;
                 trace!("initial value was successfully read from a file");
                 Ok(id_value)
             }
