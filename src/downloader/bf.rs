@@ -74,18 +74,15 @@ impl Downloader for BfDownloader {
     }
 
     fn output(&self, u: Vec<Trade>, writer: &mut impl Writer) -> Result<Self::IDT> {
-        match u.last() {
-            Some(last) => {
-                writer.write(u.as_slice()).and_then(|num| {
-                    info!("wrote {} data", num);
-                    // TODO: redundant
-                    last.id.parse::<u64>().map_err(Error::from)
-                })
-            }
-            None => {
-                warn!("no output");
-                Err(Error::NotFound)
-            }
+        if let Some(last) = u.last() {
+            writer.write(u.as_slice()).and_then(|num| {
+                info!("wrote {} data", num);
+                // TODO: redundant
+                last.id.parse::<u64>().map_err(Error::from)
+            })
+        } else {
+            warn!("no output");
+            Err(Error::NotFound)
         }
     }
 

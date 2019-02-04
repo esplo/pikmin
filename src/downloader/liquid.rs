@@ -77,30 +77,27 @@ impl Downloader for LiquidDownloader {
     /// In order to avoid an infinite loop, this function will return an error
     /// when there are more than 1,000 executions at the same timestamp.
     fn output(&self, u: Vec<Trade>, writer: &mut impl Writer) -> Result<Self::IDT> {
-        match u.last() {
-            Some(last) => {
-                let last_ts = last.traded_at;
-                let orig_len = u.len();
-                let without_last: Vec<Trade> =
-                    u.into_iter().filter(|e| e.traded_at != last_ts).collect();
+        if let Some(last) = u.last() {
+            let last_ts = last.traded_at;
+            let orig_len = u.len();
+            let without_last: Vec<Trade> =
+                u.into_iter().filter(|e| e.traded_at != last_ts).collect();
 
-                if orig_len == self.limit() && without_last.is_empty() {
-                    error!(
-                        "more than {} executions at the same timestamp",
-                        self.limit()
-                    );
-                    Err(Error::CannotFetchTradesAccurately)
-                } else {
-                    writer.write(without_last.as_slice()).map(|num| {
-                        info!("wrote {} data", num);
-                        last_ts
-                    })
-                }
+            if orig_len == self.limit() && without_last.is_empty() {
+                error!(
+                    "more than {} executions at the same timestamp",
+                    self.limit()
+                );
+                Err(Error::CannotFetchTradesAccurately)
+            } else {
+                writer.write(without_last.as_slice()).map(|num| {
+                    info!("wrote {} data", num);
+                    last_ts
+                })
             }
-            None => {
-                warn!("no output");
-                Err(Error::NotFound)
-            }
+        } else {
+            warn!("no output");
+            Err(Error::NotFound)
         }
     }
 

@@ -90,35 +90,32 @@ impl Downloader for MexDownloader {
     ///
     /// Mex API allows to send an offset parameter, so this will never get into an infinite loop.
     fn output(&self, u: Vec<Trade>, writer: &mut impl Writer) -> Result<Self::IDT> {
-        match u.last() {
-            Some(last) => {
-                let last_ts = last.traded_at;
-                let orig_len = u.len();
-                let without_last_count = u.iter().filter(|e| e.traded_at != last_ts).count();
+        if let Some(last) = u.last() {
+            let last_ts = last.traded_at;
+            let orig_len = u.len();
+            let without_last_count = u.iter().filter(|e| e.traded_at != last_ts).count();
 
-                if orig_len == self.limit() && without_last_count == 0 {
-                    debug!("increment offset");
-                    writer.write(&u).map(|num| {
-                        info!("wrote {} data", num);
-                        debug!("last id: {}", last_ts);
-                        // this increments the offset
-                        Pagination::new(DateTimeID::new(last_ts), self.limit() as u64)
-                    })
-                } else {
-                    let without_last: Vec<Trade> =
-                        u.into_iter().filter(|e| e.traded_at != last_ts).collect();
+            if orig_len == self.limit() && without_last_count == 0 {
+                debug!("increment offset");
+                writer.write(&u).map(|num| {
+                    info!("wrote {} data", num);
+                    debug!("last id: {}", last_ts);
+                    // this increments the offset
+                    Pagination::new(DateTimeID::new(last_ts), self.limit() as u64)
+                })
+            } else {
+                let without_last: Vec<Trade> =
+                    u.into_iter().filter(|e| e.traded_at != last_ts).collect();
 
-                    writer.write(without_last.as_slice()).map(|num| {
-                        info!("wrote {} data", num);
-                        debug!("last id: {}", last_ts);
-                        Pagination::new(DateTimeID::new(last_ts), 0)
-                    })
-                }
+                writer.write(without_last.as_slice()).map(|num| {
+                    info!("wrote {} data", num);
+                    debug!("last id: {}", last_ts);
+                    Pagination::new(DateTimeID::new(last_ts), 0)
+                })
             }
-            None => {
-                warn!("no output");
-                Err(Error::NotFound)
-            }
+        } else {
+            warn!("no output");
+            Err(Error::NotFound)
         }
     }
 

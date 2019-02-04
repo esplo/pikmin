@@ -122,10 +122,7 @@ impl<'a> MySQLWriter<'a> {
                     .map(|vp| {
                         let u = vp
                             .into_iter()
-                            .flat_map(|v| match v {
-                                Positional(ps) => ps,
-                                _ => smallvec![],
-                            })
+                            .flat_map(|v| if let Positional(ps) = v { ps } else { smallvec![] })
                             .collect();
                         Positional(u)
                     });
