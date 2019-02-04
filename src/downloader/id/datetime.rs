@@ -1,11 +1,14 @@
+use std::fmt;
+
 use chrono::DateTime;
 use chrono::Utc;
+use serde_derive::{Deserialize, Serialize};
 
 use crate::downloader::id::DownloaderID;
 use crate::error::Result;
 
 /// An ID implementation by chrono::DateTime<Utc>.
-#[derive(Debug)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DateTimeID {
     current: DateTime<Utc>,
 }
@@ -35,5 +38,11 @@ impl DownloaderID<DateTime<Utc>> for DateTimeID {
 impl From<DateTime<Utc>> for DateTimeID {
     fn from(idt: DateTime<Utc>) -> Self {
         DateTimeID::new(idt)
+    }
+}
+
+impl fmt::Display for DateTimeID where {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.current().to_string())
     }
 }

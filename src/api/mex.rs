@@ -46,12 +46,18 @@ impl MexAPI {
     pub fn executions(
         &self,
         start_time: &DateTime<Utc>,
+        offset: u64,
         limit: usize,
     ) -> Result<Vec<MexGetExecution>> {
-        trace!("executions -- start_time:{}, limit:{}", start_time, limit);
+        trace!(
+            "executions -- start_time:{}, offset: {}, limit:{}",
+            start_time,
+            offset,
+            limit
+        );
         let path = format!(
-            "/api/v1/trade?symbol={}&startTime={}&count={}&reverse=false",
-            self.product_code, start_time, limit
+            "/api/v1/trade?symbol={}&startTime={}&start={}&count={}&reverse=false",
+            self.product_code, start_time, offset, limit
         );
         let req = self.make_get_request(&path);
         self.send(req).map_err(Error::from)
