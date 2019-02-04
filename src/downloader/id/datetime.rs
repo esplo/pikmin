@@ -29,10 +29,6 @@ impl DownloaderID<DateTime<Utc>> for DateTimeID {
         self.current = c;
         Ok(())
     }
-
-    fn to_string(&self) -> String {
-        self.current.format("%Y-%m-%dT%H:%M:%SZ").to_string()
-    }
 }
 
 impl From<DateTime<Utc>> for DateTimeID {

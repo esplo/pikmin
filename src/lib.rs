@@ -162,6 +162,6 @@ mod tests {
             ],
         );
         // 17 + 1
-        assert_eq!(act.1, "18");
+        assert_eq!(act.1, r#"{"current":18}"#);
     }
 }

@@ -1,10 +1,12 @@
 use std::fmt::Display;
 
+use serde_derive::{Deserialize, Serialize};
+
 use crate::downloader::id::DownloaderID;
 use crate::error::Result;
 
 /// An ID implementation by integer numbers.
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct OrdID<T> {
     current: T,
 }
@@ -24,10 +26,6 @@ impl<T: Ord + Display> DownloaderID<T> for OrdID<T> {
     fn update(&mut self, c: T) -> Result<()> {
         self.current = c;
         Ok(())
-    }
-
-    fn to_string(&self) -> String {
-        format!("{}", self.current)
     }
 }
 

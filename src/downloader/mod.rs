@@ -6,6 +6,8 @@ use std::thread;
 use std::time::Duration;
 
 use log::{info, trace, warn};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 use crate::downloader::id::DownloaderID;
 use crate::error::Error;
@@ -31,7 +33,7 @@ pub trait Downloader {
     /// A type of element which ID is made up of.
     type IDT: std::str::FromStr + Display;
     /// A type of ID for specifying the downloading point in an API client.
-    type ID: DownloaderID<Self::IDT> + From<Self::IDT>;
+    type ID: DownloaderID<Self::IDT> + From<Self::IDT> + DeserializeOwned + Serialize;
     /// A type of downloaded trade data.
     type RAW;
 
@@ -100,10 +102,10 @@ pub trait Downloader {
                 .and_then(|v| v.iter().map(|t| self.convert(&t)).collect())
                 .and_then(|v| self.output(v, writer))
                 .and_then(|next_id| {
-                    init_id.update(next_id).and_then(|_| {
-                        self.record_progress(process_log_path, &init_id.to_string())
-                            .map_err(Error::from)
-                    })
+                    init_id
+                        .update(next_id)
+                        .and_then(|_| serde_json::to_string(&init_id).map_err(Error::from))
+                        .and_then(|json| self.record_progress(process_log_path, &json).map_err(Error::from))
                 })
                 .map(|_| {
                     let millis = self.sleep_millis();

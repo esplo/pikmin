@@ -16,6 +16,4 @@ pub trait DownloaderID<T: Display> {
     fn current(&self) -> &T;
     /// Updates current ID with a given ID.
     fn update(&mut self, c: T) -> Result<()>;
-    /// Converts current ID to a String value in order to record the progress.
-    fn to_string(&self) -> String;
 }

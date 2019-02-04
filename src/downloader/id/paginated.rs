@@ -62,7 +62,7 @@ impl<U, T> Display for Pagination<U, T>
 }
 
 /// An wrapper for ID with pagination.
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct PaginatedID<U, T> {
     value: Pagination<U, T>,
     phantom: PhantomData<U>,
@@ -94,11 +94,6 @@ impl<U, T> DownloaderID<Pagination<U, T>> for PaginatedID<U, T>
         let offset = if c.num == 0 { 0 } else { self.value.num + c.num };
         self.value = Pagination::new(c.id, offset);
         Ok(())
-    }
-
-    fn to_string(&self) -> String {
-        // TODO: result
-        serde_json::to_string(&self.value).unwrap()
     }
 }
 
