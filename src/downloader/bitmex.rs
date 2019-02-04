@@ -29,7 +29,7 @@ impl MexDownloader {
     /// Creates a new downloader with a specific range.
     /// The input source is fixed.
     pub fn new(start: DateTime<Utc>, end: DateTime<Utc>) -> Self {
-        MexDownloader {
+        Self {
             start: Pagination::new(DateTimeID::new(start), 0),
             end: Pagination::new(DateTimeID::new(end), 0),
             api: MexAPI::new(),

@@ -12,7 +12,7 @@ pub struct OrdID<T> {
 impl<T: Ord> OrdID<T> {
     /// Creates an ID with a given number.
     pub fn new(current: T) -> Self {
-        OrdID { current }
+        Self { current }
     }
 }
 
@@ -33,6 +33,6 @@ impl<T: Ord + Display> DownloaderID<T> for OrdID<T> {
 
 impl<T: Ord> From<T> for OrdID<T> {
     fn from(idt: T) -> Self {
-        OrdID::new(idt)
+        Self::new(idt)
     }
 }

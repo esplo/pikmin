@@ -68,43 +68,43 @@ impl std::error::Error for Error {
 }
 
 impl From<reqwest::Error> for Error {
-    fn from(err: reqwest::Error) -> Error {
+    fn from(err: reqwest::Error) -> Self {
         Error::Reqwest(err)
     }
 }
 
 impl From<std::num::ParseFloatError> for Error {
-    fn from(err: std::num::ParseFloatError) -> Error {
+    fn from(err: std::num::ParseFloatError) -> Self {
         Error::ParseFloat(err)
     }
 }
 
 impl From<std::num::ParseIntError> for Error {
-    fn from(err: std::num::ParseIntError) -> Error {
+    fn from(err: std::num::ParseIntError) -> Self {
         Error::ParseInt(err)
     }
 }
 
 impl From<mysql::error::Error> for Error {
-    fn from(err: mysql::error::Error) -> Error {
+    fn from(err: mysql::error::Error) -> Self {
         Error::MySql(Box::new(err))
     }
 }
 
 impl From<std::io::Error> for Error {
-    fn from(err: std::io::Error) -> Error {
+    fn from(err: std::io::Error) -> Self {
         Error::IO(err)
     }
 }
 
 impl From<chrono::format::ParseError> for Error {
-    fn from(err: chrono::format::ParseError) -> Error {
+    fn from(err: chrono::format::ParseError) -> Self {
         Error::ChronoParse(err)
     }
 }
 
 impl From<serde_json::error::Error> for Error {
-    fn from(err: serde_json::error::Error) -> Error {
+    fn from(err: serde_json::error::Error) -> Self {
         Error::ParseJson(err)
     }
 }

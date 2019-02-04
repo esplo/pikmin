@@ -16,7 +16,7 @@ pub struct DateTimeID {
 impl DateTimeID {
     /// Creates an ID with a given time.
     pub fn new(current: DateTime<Utc>) -> Self {
-        DateTimeID { current }
+        Self { current }
     }
 }
 
@@ -37,7 +37,7 @@ impl DownloaderID<DateTime<Utc>> for DateTimeID {
 
 impl From<DateTime<Utc>> for DateTimeID {
     fn from(idt: DateTime<Utc>) -> Self {
-        DateTimeID::new(idt)
+        Self::new(idt)
     }
 }
 

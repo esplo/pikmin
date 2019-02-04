@@ -27,7 +27,7 @@ impl BfDownloader {
     /// Creates a new downloader with a specific range.
     /// The input source is fixed.
     pub fn new(newer: u64, older: u64) -> Self {
-        BfDownloader {
+        Self {
             start: older,
             end: newer,
             api: BfAPI::new(),

@@ -26,7 +26,7 @@ impl<U, T> Pagination<U, T>
 {
     /// Creates new pagination with ID.
     pub fn new(id: T, num: u64) -> Self {
-        Pagination {
+        Self {
             id,
             num,
             phantom: PhantomData,
@@ -74,7 +74,7 @@ impl<U, T> PaginatedID<U, T>
         U: Display,
 {
     fn new(value: Pagination<U, T>) -> Self {
-        PaginatedID {
+        Self {
             value,
             phantom: PhantomData,
         }
@@ -108,6 +108,6 @@ impl<U, T> From<Pagination<U, T>> for PaginatedID<U, T>
         U: Display,
 {
     fn from(v: Pagination<U, T>) -> Self {
-        PaginatedID::new(v)
+        Self::new(v)
     }
 }

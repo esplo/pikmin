@@ -31,7 +31,7 @@ impl Default for BfAPI {
 
 impl BfAPI {
     pub fn new() -> Self {
-        BfAPI {
+        Self {
             reqwest_client: Client::new(),
             product_code: "FX_BTC_JPY",
         }

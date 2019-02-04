@@ -37,7 +37,7 @@ impl Default for MexAPI {
 
 impl MexAPI {
     pub fn new() -> Self {
-        MexAPI {
+        Self {
             reqwest_client: Client::new(),
             product_code: "XBTUSD",
         }

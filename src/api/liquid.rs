@@ -30,7 +30,7 @@ impl Default for LiquidAPI {
 
 impl LiquidAPI {
     pub fn new() -> Self {
-        LiquidAPI {
+        Self {
             reqwest_client: Client::new(),
             product_code: "5",
         }

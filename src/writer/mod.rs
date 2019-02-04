@@ -30,7 +30,7 @@ pub struct Trade {
 }
 
 impl PartialEq for Trade {
-    fn eq(&self, other: &Trade) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         self.id == other.id
             && self.traded_at == other.traded_at
             && (self.quantity - other.quantity).abs() <= std::f32::EPSILON
