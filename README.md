@@ -37,15 +37,17 @@ This program creates `./qn-progress.txt` for recording progress,
 so delete it if you want to run again from the starting point.
 
 ```rust
-use std::path::Path;
+use std::path::PathBuf;
 use std::thread;
 use std::time::Duration;
 
 use chrono::offset::TimeZone;
 use chrono::Utc;
 
-use pikmin::{LiquidDownloader, StdOutWriter};
 use pikmin::downloader::Downloader;
+use pikmin::FileRecorder;
+use pikmin::LiquidDownloader;
+use pikmin::StdOutWriter;
 
 fn main() {
     // by using thread, you can run multiple downloaders
@@ -61,7 +63,7 @@ fn main() {
             // Locate progress file to `/tmp/qn-progress.txt`.
             // You can control the starting point of downloading
             // by preparing this file before you run.
-            let progress_file = Path::new("./qn-progress.txt");
+            let mut recorder = FileRecorder::new(PathBuf::from("/tmp/qn-progress.txt"));
 
             // write out to standard out. simple writer for debugging
             let mut writer = StdOutWriter::default();
@@ -69,7 +71,7 @@ fn main() {
             println!("start QnDownloader");
 
             // run!
-            match downloader.run(&mut writer, &progress_file) {
+            match downloader.run(&mut writer, &mut recorder) {
                 Ok(_) => {
                     println!("finished");
                     false
@@ -84,10 +86,12 @@ fn main() {
         } {}
     });
 
-    match liquid.join() {
-        Ok(_) => println!("finish all"),
-        Err(_) => println!("threading error"),
-    }
+    match liquid
+        .join()
+        {
+            Ok(_) => println!("finish all"),
+            Err(_) => println!("threading error"),
+        }
 }
 ```
 
