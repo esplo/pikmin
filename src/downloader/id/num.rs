@@ -5,7 +5,7 @@ use crate::error::Result;
 
 /// An ID implementation by integer numbers.
 #[derive(Debug)]
-pub struct OrdID<T: Ord> {
+pub struct OrdID<T> {
     current: T,
 }
 
