@@ -1,7 +1,4 @@
 use std::fmt::Display;
-use std::fs::OpenOptions;
-use std::io::Write;
-use std::path::Path;
 use std::thread;
 use std::time::Duration;
 
@@ -12,7 +9,7 @@ use serde::Serialize;
 use crate::downloader::id::DownloaderID;
 use crate::error::Error;
 use crate::error::Result;
-use crate::util::reader::from_existing_file;
+use crate::recorder::ProgressRecorder;
 use crate::writer::Trade;
 use crate::writer::Writer;
 
@@ -38,10 +35,10 @@ pub trait Downloader {
     type RAW;
 
     /// Returns initial ID from a progress file. If reading is failed, use a given `default` value.
-    fn init_id(&self, default: Self::IDT, process_log_path: &Path) -> Result<Self::IDT> {
-        match from_existing_file(process_log_path) {
+    fn init_id(&self, default: Self::IDT, recorder: &mut impl ProgressRecorder) -> Result<Self::IDT> {
+        match recorder.read() {
             Ok(ref s) if s.is_empty() => {
-                warn!("no content in {}", process_log_path.display());
+                warn!("no content, start with the default value: {}", default);
                 Ok(default)
             }
             Ok(s) => {
@@ -74,24 +71,12 @@ pub trait Downloader {
     /// This must return an id for the next iteration, and this will be recorded on a progress file.
     fn output(&self, u: Vec<Trade>, writer: &mut impl Writer) -> Result<Self::IDT>;
 
-    /// Records progress on somewhere (typically a file).
-    fn record_progress(&self, path: &Path, id: &str) -> Result<()> {
-        trace!("record ID: {}", id);
-        let mut file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .truncate(true)
-            .open(path)?;
-        file.write_all(id.as_bytes())?;
-        Ok(())
-    }
-
     /// Returns milli seconds to sleep between fetching processes.
     fn sleep_millis(&self) -> u64;
 
     /// Executes downloading.
-    fn run(&self, writer: &mut impl Writer, process_log_path: &Path) -> Result<()> {
-        let init_id_value = self.init_id(self.start_id(), process_log_path)?;
+    fn run(&self, writer: &mut impl Writer, recorder: &mut impl ProgressRecorder) -> Result<()> {
+        let init_id_value = self.init_id(self.start_id(), recorder)?;
         info!("start from {}", init_id_value);
         let mut init_id = Self::ID::from(init_id_value);
         let end_id_value = self.end_id();
@@ -105,7 +90,7 @@ pub trait Downloader {
                     init_id
                         .update(next_id)
                         .and_then(|_| serde_json::to_string(&init_id).map_err(Error::from))
-                        .and_then(|json| self.record_progress(process_log_path, &json).map_err(Error::from))
+                        .and_then(|json| recorder.out(&json))
                 })
                 .map(|_| {
                     let millis = self.sleep_millis();

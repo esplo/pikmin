@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::PathBuf;
 use std::thread;
 use std::time::Duration;
 
@@ -8,6 +8,8 @@ use chrono::Utc;
 use pikmin::{MySQLWriter, StdOutWriter};
 use pikmin::{BfDownloader, LiquidDownloader, MexDownloader};
 use pikmin::downloader::Downloader;
+use pikmin::FileRecorder;
+use pikmin::recorder::memory::MemoryRecorder;
 
 // You can easily create a custom writer (this will be used in the `mex` example)
 struct CustomWriter {}
@@ -35,7 +37,7 @@ fn main() {
             // Locate progress file to `/tmp/qn-progress.txt`.
             // You can control the starting point of downloading
             // by preparing this file before you run.
-            let progress_file = Path::new("/tmp/qn-progress.txt");
+            let mut recorder = FileRecorder::new(PathBuf::from("/tmp/qn-progress.txt"));
 
             // write out to standard out. simple writer for debugging
             let mut writer = StdOutWriter::default();
@@ -43,7 +45,7 @@ fn main() {
             println!("start QnDownloader");
 
             // run!
-            match downloader.run(&mut writer, &progress_file) {
+            match downloader.run(&mut writer, &mut recorder) {
                 Ok(_) => {
                     println!("finished");
                     false
@@ -65,7 +67,8 @@ fn main() {
             // Notice: execution data older than 1 month are not allowed to download on BitFlyer
             let downloader = BfDownloader::new(764637994, 764677430);
 
-            let progress_file = Path::new("/tmp/bf-progress.txt");
+            // This progress recorder is just in-memory for debugging purpose.
+            let mut recorder = MemoryRecorder::default();
 
             // Make MySQL connection
             let mut mysql_writer =
@@ -73,7 +76,7 @@ fn main() {
 
             println!("start BfDownloader");
 
-            match downloader.run(&mut mysql_writer, &progress_file) {
+            match downloader.run(&mut mysql_writer, &mut recorder) {
                 Ok(_) => {
                     println!("finished");
                     false
@@ -95,14 +98,15 @@ fn main() {
                 Utc.ymd(2019, 1, 1).and_hms(1, 3, 1),
             );
 
-            let progress_file = Path::new("/tmp/mex-progress.txt");
+            // This progress recorder is just in-memory for debugging purpose.
+            let mut recorder = MemoryRecorder::default();
 
             // custom writer
             let mut writer = CustomWriter {};
 
             println!("start MexDownloader");
 
-            match downloader.run(&mut writer, &progress_file) {
+            match downloader.run(&mut writer, &mut recorder) {
                 Ok(_) => {
                     println!("finished");
                     false

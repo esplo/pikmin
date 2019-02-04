@@ -16,15 +16,17 @@
 //! so delete it if you want to run again from the starting point.
 //!
 //! ```
-//! use std::path::Path;
+//! use std::path::PathBuf;
 //! use std::thread;
 //! use std::time::Duration;
 //!
 //! use chrono::offset::TimeZone;
 //! use chrono::Utc;
 //!
-//! use pikmin::{LiquidDownloader, StdOutWriter};
 //! use pikmin::downloader::Downloader;
+//! use pikmin::FileRecorder;
+//! use pikmin::LiquidDownloader;
+//! use pikmin::StdOutWriter;
 //!
 //! fn main() {
 //!     // by using thread, you can run multiple downloaders
@@ -40,7 +42,7 @@
 //!             // Locate progress file to `/tmp/qn-progress.txt`.
 //!             // You can control the starting point of downloading
 //!             // by preparing this file before you run.
-//!             let progress_file = Path::new("/tmp/qn-progress.txt");
+//!             let mut recorder = FileRecorder::new(PathBuf::from("/tmp/qn-progress.txt"));
 //!
 //!             // write out to standard out. simple writer for debugging
 //!             let mut writer = StdOutWriter::default();
@@ -48,7 +50,7 @@
 //!             println!("start QnDownloader");
 //!
 //!             // run!
-//!             match downloader.run(&mut writer, &progress_file) {
+//!             match downloader.run(&mut writer, &mut recorder) {
 //!                 Ok(_) => {
 //!                     println!("finished");
 //!                     false
@@ -63,16 +65,19 @@
 //!         } {}
 //!     });
 //!
-//!     match liquid.join() {
-//!         Ok(_) => println!("finish all"),
-//!         Err(_) => println!("threading error"),
-//!     }
+//!     match liquid
+//!         .join()
+//!         {
+//!             Ok(_) => println!("finish all"),
+//!             Err(_) => println!("threading error"),
+//!         }
 //! }
 //! ```
 
 pub use self::downloader::bf::BfDownloader;
 pub use self::downloader::bitmex::MexDownloader;
 pub use self::downloader::liquid::LiquidDownloader;
+pub use self::recorder::file::FileRecorder;
 pub use self::writer::db_mysql::MySQLWriter;
 pub use self::writer::stdout::StdOutWriter;
 
@@ -82,22 +87,20 @@ mod api;
 pub mod downloader;
 /// Error utilities.
 pub mod error;
-/// Utilities for creating a downloader
-mod util;
 /// Writers to output the trade data into external storage.
 pub mod writer;
+/// Recorders to record the progress on external storage to resume.
+pub mod recorder;
 
 #[cfg(test)]
 mod tests {
-    use std::io::prelude::*;
-
     use chrono::offset::TimeZone;
     use chrono::Utc;
-    use tempfile::NamedTempFile;
 
     use crate::downloader::Downloader;
     use crate::downloader::mock::RawData;
-    use crate::error::Result;
+    use crate::recorder::memory::MemoryRecorder;
+    use crate::recorder::ProgressRecorder;
     use crate::writer::Trade;
 
     use super::*;
@@ -117,22 +120,15 @@ mod tests {
         let downloader = downloader::mock::MockDownloader::new(data, 10, 16);
 
         let mut writer = writer::mock::MockWriter::new();
+        let mut progress_recorder = MemoryRecorder::default();
 
-        let actual_fn = || -> Result<_> {
-            let mut tmpf = NamedTempFile::new()?;
-            let stored: Vec<Trade> = downloader
-                .run(&mut writer, &tmpf.path())
-                .map(|_| writer.store)?;
-            let mut progress = String::new();
-            tmpf.read_to_string(&mut progress)?;
-            Ok((stored, progress))
-        };
+        let actual = downloader
+            .run(&mut writer, &mut progress_recorder)
+            .map(|_| writer.store);
 
-        let actual = actual_fn();
         assert_eq!(actual.is_ok(), true);
-        let act = actual.unwrap();
         assert_eq!(
-            act.0,
+            actual.unwrap(),
             vec![
                 Trade {
                     id: String::from("10"),
@@ -161,7 +157,10 @@ mod tests {
                 },
             ],
         );
+
+        let rec = progress_recorder.read();
+        assert_eq!(rec.is_ok(), true);
         // 17 + 1
-        assert_eq!(act.1, r#"{"current":18}"#);
+        assert_eq!(rec.unwrap(), r#"{"current":18}"#);
     }
 }

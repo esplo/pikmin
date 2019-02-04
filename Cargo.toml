@@ -28,13 +28,9 @@ smallvec = "^0.6.8"
 
 [dev-dependencies]
 env_logger = "^0.6"
-tempfile = "3"
 
 [[example]]
 name = "main"
-
-[[example]]
-name = "simple"
 
 [badges]
 travis-ci = { repository = "esplo/pikmin", branch = "master" }
