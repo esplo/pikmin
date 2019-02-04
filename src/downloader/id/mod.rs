@@ -6,6 +6,8 @@ use crate::error::Result;
 pub mod datetime;
 /// An ID implementation by integer numbers.
 pub mod num;
+/// An ID Wrapper for pagination.
+pub mod paginated;
 
 /// An abstraction for IDs. This trait must be implemented if you want to create a downloader
 /// with a new ID management.
