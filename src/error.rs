@@ -13,8 +13,6 @@ pub enum Error {
     ParseFloat(std::num::ParseFloatError),
     /// An `std::num::ParseIntError` that occurred while converting a value to a Int value.
     ParseInt(std::num::ParseIntError),
-    /// An error that occurred while reading an ID value from a string.
-    ParseValueFromStr,
     /// An `mysql::error::Error` that occurred in general MySQL processing.
     MySql(Box<mysql::error::Error>),
     /// An error that occurred when parameter mappings are invalid.
@@ -55,7 +53,6 @@ impl std::error::Error for Error {
             Error::Reqwest(ref e) => e.description(),
             Error::ParseFloat(ref e) => e.description(),
             Error::ParseInt(ref e) => e.description(),
-            Error::ParseValueFromStr => "Cannot parse the initial value",
             Error::MySql(ref e) => e.description(),
             Error::MySqlMissingNamedParameter(ref e) => e.description(),
             Error::NotFound => "No data found",

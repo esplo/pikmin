@@ -162,5 +162,19 @@ mod tests {
         assert_eq!(rec.is_ok(), true);
         // 17 + 1
         assert_eq!(rec.unwrap(), r#"{"current":18}"#);
+
+        // run again
+        {
+            let mut writer = writer::mock::MockWriter::new();
+            let actual2 = downloader
+                .run(&mut writer, &mut progress_recorder)
+                .map(|_| writer.store);
+
+            assert_eq!(actual2.is_ok(), true);
+            assert_eq!(
+                actual2.unwrap(),
+                vec![],
+            );
+        }
     }
 }

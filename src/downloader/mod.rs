@@ -28,29 +28,27 @@ pub(crate) mod mock;
 /// An abstraction of downloaders. You can make a new downloader by implementing this trait.
 pub trait Downloader {
     /// A type of element which ID is made up of.
-    type IDT: std::str::FromStr + Display;
+    type IDT: DeserializeOwned + Display;
     /// A type of ID for specifying the downloading point in an API client.
     type ID: DownloaderID<Self::IDT> + From<Self::IDT> + DeserializeOwned + Serialize;
     /// A type of downloaded trade data.
     type RAW;
 
     /// Returns initial ID from a progress file. If reading is failed, use a given `default` value.
-    fn init_id(&self, default: Self::IDT, recorder: &mut impl ProgressRecorder) -> Result<Self::IDT> {
+    fn init_id(&self, default: Self::IDT, recorder: &mut impl ProgressRecorder) -> Result<Self::ID> {
         match recorder.read() {
             Ok(ref s) if s.is_empty() => {
                 warn!("no content, start with the default value: {}", default);
-                Ok(default)
+                Ok(Self::ID::from(default))
             }
             Ok(s) => {
-                let id_value = s
-                    .parse::<Self::IDT>()
-                    .map_err(|_| Error::ParseValueFromStr)?;
+                let id = serde_json::from_str(&s).map_err(Error::ParseJson)?;
                 trace!("initial value was successfully read from a file");
-                Ok(id_value)
+                Ok(id)
             }
             Err(e) => {
                 warn!("cannot read from a file: {}", e);
-                Ok(default)
+                Ok(Self::ID::from(default))
             }
         }
     }
@@ -76,9 +74,8 @@ pub trait Downloader {
 
     /// Executes downloading.
     fn run(&self, writer: &mut impl Writer, recorder: &mut impl ProgressRecorder) -> Result<()> {
-        let init_id_value = self.init_id(self.start_id(), recorder)?;
-        info!("start from {}", init_id_value);
-        let mut init_id = Self::ID::from(init_id_value);
+        let mut init_id = self.init_id(self.start_id(), recorder)?;
+        info!("start from {}", init_id.current());
         let end_id_value = self.end_id();
         info!("run to {}", end_id_value);
 
