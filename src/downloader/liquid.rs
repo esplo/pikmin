@@ -8,6 +8,7 @@ use crate::api::liquid::LiquidGetExecution;
 use crate::downloader::Downloader;
 use crate::downloader::id::datetime::DateTimeID;
 use crate::error::Error;
+use crate::error::Error::InvalidSide;
 use crate::error::Result;
 use crate::writer::Trade;
 use crate::writer::Writer;
@@ -57,7 +58,12 @@ impl Downloader for LiquidDownloader {
     }
 
     fn convert(&self, v: &LiquidGetExecution) -> Result<Trade> {
-        let quantity = v.quantity.parse::<f32>()?;
+        let f_quantity = v.quantity.parse::<f32>()?;
+        let quantity = match v.taker_side.as_ref() {
+            "buy" => Ok(f_quantity),
+            "sell" => Ok(-1.0 * f_quantity),
+            s => Err(InvalidSide(s.to_owned())),
+        }?;
         let price = v.price.parse::<f32>()?;
         let created_at = Utc.timestamp(v.created_at as i64, 0);
 
@@ -103,5 +109,55 @@ impl Downloader for LiquidDownloader {
 
     fn sleep_millis(&self) -> u64 {
         1100
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn liquid_converter_test() {
+        let dummy = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+        let ld = LiquidDownloader::new(dummy, dummy);
+
+        {
+            let arg = LiquidGetExecution {
+                id: 5,
+                quantity: "0.12".to_string(),
+                price: "123.4".to_string(),
+                taker_side: "buy".to_string(),
+                created_at: 1323318775,
+            };
+            let exp = Trade {
+                id: "5".to_string(),
+                traded_at: Utc.ymd(2011, 12, 8).and_hms(4, 32, 55),
+                quantity: 0.12,
+                price: 123.4,
+            };
+            let res = ld.convert(&arg);
+            assert_eq!(true, res.is_ok());
+            assert_eq!(exp, res.unwrap());
+        }
+
+        {
+            let arg = LiquidGetExecution {
+                id: 5,
+                quantity: "0.12".to_string(),
+                price: "123.4".to_string(),
+                taker_side: "sell".to_string(),
+                created_at: 1323318775,
+            };
+            let exp = Trade {
+                id: "5".to_string(),
+                traded_at: Utc.ymd(2011, 12, 8).and_hms(4, 32, 55),
+                quantity: -0.12,
+                price: 123.4,
+            };
+            let res = ld.convert(&arg);
+            assert_eq!(true, res.is_ok());
+            assert_eq!(exp, res.unwrap());
+        }
     }
 }

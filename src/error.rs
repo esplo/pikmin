@@ -28,6 +28,8 @@ pub enum Error {
     CannotFetchTradesAccurately,
     /// An error that occurred when it failed to parse as a json value.
     ParseJson(serde_json::error::Error),
+    /// An error that occurred when the order/position side is invalid.
+    InvalidSide(String),
 }
 
 impl fmt::Display for Error {
@@ -41,6 +43,7 @@ impl fmt::Display for Error {
             Error::IO(ref e) => e.fmt(f),
             Error::ChronoParse(ref e) => e.fmt(f),
             Error::ParseJson(ref e) => e.fmt(f),
+            Error::InvalidSide(ref s) => write!(f, "Invalid side: {}", s),
 
             ref e => f.write_str(e.description()),
         }
@@ -60,6 +63,7 @@ impl std::error::Error for Error {
             Error::ChronoParse(ref e) => e.description(),
             Error::CannotFetchTradesAccurately => "Cannot fetch from API",
             Error::ParseJson(ref e) => e.description(),
+            Error::InvalidSide(_) => "Invalid side",
         }
     }
 }
