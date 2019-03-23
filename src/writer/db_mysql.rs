@@ -1,7 +1,7 @@
 use log::trace;
 use mysql::Params;
+use mysql::Params::Positional;
 use mysql::Pool;
-use mysql_common::params::Params::Positional;
 use smallvec::smallvec;
 
 use crate::error::Error;
@@ -13,8 +13,38 @@ use crate::writer::Writer;
 pub trait MySQLWriterElement {
     /// Converts a contents into MySQL params.
     fn to_params(&self) -> Params;
-    /// Returns a table definition for MySQL.
+    /// Returns table definitions for MySQL.
     fn table_def() -> Vec<TableDef>;
+    /// Optionally returns index definitions.
+    fn index_names() -> Vec<String>;
+    /// Returns a string to create a table.
+    fn create_table_stmt(table_name: &str) -> String {
+        // create column definition
+        // e.g.
+        //
+        // ```
+        // id BIGINT NOT NULL PRIMARY KEY,
+        // traded_at TIMESTAMP(3) NOT NULL,
+        // amount FLOAT NOT NULL,
+        // price FLOAT NOT NULL
+        // ```
+        let columns = Self::table_def()
+            .iter()
+            .map(|TableDef(k, v)| format!("{} {}", k, v))
+            .collect::<Vec<String>>();
+
+        let index = Self::index_names()
+            .iter()
+            .map(|name| format!("KEY `ind_{s}` (`{s}`)", s = name))
+            .collect::<Vec<String>>();
+
+        let definition = [&columns[..], &index[..]].concat().join(", ");
+
+        format!(
+            r"CREATE TABLE IF NOT EXISTS {} ( {} );",
+            table_name, definition
+        )
+    }
 }
 
 /// A definition for MySQL.
@@ -63,25 +93,7 @@ impl<'a> MySQLWriter<'a> {
     }
 
     fn create_table<T: MySQLWriterElement>(&self) {
-        // create column definition
-        // e.g.
-        //
-        // ```
-        // id BIGINT NOT NULL PRIMARY KEY,
-        // traded_at TIMESTAMP(3) NOT NULL,
-        // amount FLOAT NOT NULL,
-        // price FLOAT NOT NULL
-        // ```
-        let definition = T::table_def()
-            .iter()
-            .map(|TableDef(k, v)| format!("{} {}", k, v))
-            .collect::<Vec<String>>()
-            .join(",");
-
-        let create_stmt = format!(
-            r"CREATE TABLE IF NOT EXISTS {} ( {} );",
-            self.table_name, definition,
-        );
+        let create_stmt = T::create_table_stmt(self.table_name);
         self.connection.prep_exec(create_stmt, ()).unwrap();
     }
 
@@ -145,3 +157,4 @@ impl<'a> Writer for MySQLWriter<'a> {
         self.bulk_insert(trades)
     }
 }
+

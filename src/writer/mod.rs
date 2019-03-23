@@ -60,6 +60,10 @@ impl MySQLWriterElement for Trade {
             TableDef::new("price", "FLOAT NOT NULL"),
         ]
     }
+
+    fn index_names() -> Vec<String> {
+        vec!["traded_at".to_owned()]
+    }
 }
 
 impl StdOutWriterElement for Trade {
@@ -72,4 +76,19 @@ impl StdOutWriterElement for Trade {
 pub trait Writer {
     /// Records `trades` on somewhere (typically DB).
     fn write(&mut self, trades: &[Trade]) -> Result<u64>;
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn mysql_create_table_test() {
+        let exp = "CREATE TABLE IF NOT EXISTS test ( id VARCHAR(64) NOT NULL PRIMARY KEY, traded_at TIMESTAMP(3) NOT NULL, amount FLOAT NOT NULL, price FLOAT NOT NULL, KEY `ind_traded_at` (`traded_at`) );";
+        assert_eq!(
+            exp,
+            Trade::create_table_stmt("test"),
+        );
+    }
 }
