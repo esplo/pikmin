@@ -4,7 +4,7 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::Serialize as TSerialize;
 use serde_derive::{Deserialize, Serialize};
 
 use crate::downloader::id::DownloaderID;
@@ -21,7 +21,7 @@ pub struct Pagination<U, T> {
 
 impl<U, T> Pagination<U, T>
     where
-        T: DownloaderID<U> + DeserializeOwned + Serialize,
+        T: DownloaderID<U> + DeserializeOwned + TSerialize,
         U: Display,
 {
     /// Creates new pagination with ID.
@@ -41,7 +41,7 @@ impl<U, T> Pagination<U, T>
 
 impl<U, T> FromStr for Pagination<U, T>
     where
-        T: DownloaderID<U> + DeserializeOwned + Serialize,
+        T: DownloaderID<U> + DeserializeOwned + TSerialize,
         U: Display,
 {
     type Err = Error;
@@ -53,7 +53,7 @@ impl<U, T> FromStr for Pagination<U, T>
 
 impl<U, T> Display for Pagination<U, T>
     where
-        T: DownloaderID<U> + DeserializeOwned + Serialize,
+        T: DownloaderID<U> + DeserializeOwned + TSerialize,
         U: Display,
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -70,7 +70,7 @@ pub struct PaginatedID<U, T> {
 
 impl<U, T> PaginatedID<U, T>
     where
-        T: DownloaderID<U> + DeserializeOwned + Serialize,
+        T: DownloaderID<U> + DeserializeOwned + TSerialize,
         U: Display,
 {
     fn new(value: Pagination<U, T>) -> Self {
@@ -83,7 +83,7 @@ impl<U, T> PaginatedID<U, T>
 
 impl<U, T> DownloaderID<Pagination<U, T>> for PaginatedID<U, T>
     where
-        T: DownloaderID<U> + DeserializeOwned + Serialize,
+        T: DownloaderID<U> + DeserializeOwned + TSerialize,
         U: Display,
 {
     fn current(&self) -> &Pagination<U, T> {
@@ -99,7 +99,7 @@ impl<U, T> DownloaderID<Pagination<U, T>> for PaginatedID<U, T>
 
 impl<U, T> From<Pagination<U, T>> for PaginatedID<U, T>
     where
-        T: DownloaderID<U> + DeserializeOwned + Serialize,
+        T: DownloaderID<U> + DeserializeOwned + TSerialize,
         U: Display,
 {
     fn from(v: Pagination<U, T>) -> Self {
